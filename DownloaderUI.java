@@ -14,6 +14,10 @@ public class DownloaderUI implements ActionListener {
     private DownloadHistory history;     // handles saving and reading download history
     private JButton historyButton;       // opens the history popup
     private JLabel thumbnailLabel;       // displays the video thumbnail
+    private JProgressBar progressBar;
+    private JLabel  progressLabel;
+    private JButton browseButton;
+    private JLabel saveLocationLabel;
 
     DownloaderUI() {
         frame = new JFrame("Youtube Downloader");
@@ -25,7 +29,18 @@ public class DownloaderUI implements ActionListener {
         downloadButton.addActionListener(this); // calls actionPerformed when clicked
         historyButton = new JButton("Show History");
         historyButton.addActionListener(this);
+        browseButton = new JButton("Browse");
+        browseButton.addActionListener(this);
+        saveLocationLabel = new JLabel(System.getProperty("user.home") + "/Downloads");
         statusLabel = new JLabel("Enter a URL and click Download");
+
+        progressBar = new JProgressBar(0,100);
+        progressBar.setStringPainted(false);
+        progressBar.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, progressBar.getPreferredSize().height));
+        
+        progressLabel = new JLabel("0%");
+
+
         thumbnailLabel = new JLabel();
 
         formatBox = new JComboBox<>(new String[]{"mp4", "mp3"});
@@ -39,9 +54,14 @@ public class DownloaderUI implements ActionListener {
         panel.add(new JLabel("format"));
         panel.add(formatBox);
         panel.add(downloadButton);
+        panel.add(progressBar);
+        panel.add(progressLabel);
         panel.add(thumbnailLabel);
         panel.add(historyButton);
         panel.add(statusLabel);
+        panel.add(new JLabel("Save to:"));
+        panel.add(saveLocationLabel);
+        panel.add(browseButton);
 
         thumbnailLabel.setPreferredSize(new java.awt.Dimension(160, 90));
         thumbnailLabel.setMinimumSize(new java.awt.Dimension(160, 90));
@@ -65,8 +85,8 @@ public class DownloaderUI implements ActionListener {
             // run the download in a separate thread so the UI doesn't freeze
             new Thread(() -> {
                 try {
-                    Downloader downloader = new Downloader(url, System.getProperty("user.home") + "/Downloads", format);
-                    downloader.download();
+                    Downloader downloader = new Downloader(url, saveLocationLabel.getText(),format);
+                    downloader.download(progressBar, progressLabel);
                     history.add(url, format); // save to history after a successful download
                     statusLabel.setText("Done!");
                 } catch (Exception ex) {
@@ -81,6 +101,13 @@ public class DownloaderUI implements ActionListener {
                 JOptionPane.showMessageDialog(frame, text, "Download History", JOptionPane.PLAIN_MESSAGE);
             } catch (Exception ex) {
                 statusLabel.setText("Error: " + ex.getMessage());
+            }
+        }else if (e.getSource() == browseButton) {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int result = chooser.showOpenDialog(frame);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                saveLocationLabel.setText(chooser.getSelectedFile().getAbsolutePath());
             }
         }
     }
