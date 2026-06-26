@@ -94,6 +94,10 @@ public class DownloaderUI implements ActionListener {
             String format = (String) formatBox.getSelectedItem();
             String quality = (String) qualityBox.getSelectedItem();
             boolean playlist = playlistCheckBox.isSelected();
+            if(url.isEmpty()){
+                statusLabel.setText("Please enter a URL");
+                return;
+            }
             showThumbnail(url); // fetch and display thumbnail before downloading
             statusLabel.setText("Downloading...");
             // run the download in a separate thread so the UI doesn't freeze

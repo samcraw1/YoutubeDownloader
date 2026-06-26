@@ -21,6 +21,11 @@ public class Downloader {
 
     // Builds and runs the yt-dlp command, reads its output to update the progress bar
     public void download(JProgressBar progressBar, JLabel progressLabel) throws Exception {
+        java.io.File ytdlp = new java.io.File("/opt/homebrew/bin/yt-dlp");
+        if(!ytdlp.exists()) {
+        throw new Exception("yt-dlp not found. install it with brew install yt-dlp");
+        }
+        
         ProcessBuilder pb;
         String playlistFlag = playlist ? "--yes-playlist" : "--no-playlist";
         if (format.equals("mp3")) {
