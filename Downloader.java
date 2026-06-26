@@ -8,24 +8,27 @@ public class Downloader {
     private String outputPath;
     private String format;
     private String quality;
+    private boolean playlist;
 
     // Stores the URL, where to save the file, format, and quality
-    Downloader(String url, String outputpath, String format, String quality) {
+    Downloader(String url, String outputpath, String format, String quality, boolean playlist) {
         this.url = url;
         this.outputPath = outputpath;
         this.format = format;
         this.quality = quality;
+        this.playlist = playlist;
     }
 
     // Builds and runs the yt-dlp command, reads its output to update the progress bar
     public void download(JProgressBar progressBar, JLabel progressLabel) throws Exception {
         ProcessBuilder pb;
+        String playlistFlag = playlist ? "--yes-playlist" : "--no-playlist";
         if (format.equals("mp3")) {
-            pb = new ProcessBuilder("/opt/homebrew/bin/yt-dlp", "-x", "--audio-format", "mp3", "-o", outputPath + "/%(title)s.%(ext)s", url);
+            pb = new ProcessBuilder("/opt/homebrew/bin/yt-dlp", playlistFlag, "-x", "--audio-format", "mp3", "-o", outputPath + "/%(title)s.%(ext)s", url);
         } else {
             // strip the "p" from "1080p" to get just the number for yt-dlp
             String height = quality.replace("p", "");
-            pb = new ProcessBuilder("/opt/homebrew/bin/yt-dlp", "-f", "bestvideo[height<=" + height + "]+bestaudio/best", "-o", outputPath + "/%(title)s.%(ext)s", url);
+            pb = new ProcessBuilder("/opt/homebrew/bin/yt-dlp", playlistFlag, "-f", "bestvideo[height<=" + height + "]+bestaudio/best", "-o", outputPath + "/%(title)s.%(ext)s", url);
         }
         pb.redirectErrorStream(true); // merge stderr into stdout so we catch all output
         Process process = pb.start();

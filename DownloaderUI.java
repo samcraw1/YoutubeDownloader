@@ -19,6 +19,7 @@ public class DownloaderUI implements ActionListener {
     private JButton browseButton;
     private JLabel saveLocationLabel;
     private JComboBox<String> qualityBox;
+    private JCheckBox playlistCheckBox;
 
     DownloaderUI() {
         frame = new JFrame("Youtube Downloader");
@@ -32,6 +33,7 @@ public class DownloaderUI implements ActionListener {
         historyButton.addActionListener(this);
         browseButton = new JButton("Browse");
         browseButton.addActionListener(this);
+        playlistCheckBox = new JCheckBox("download full playlist");
         saveLocationLabel = new JLabel(System.getProperty("user.home") + "/Downloads");
         statusLabel = new JLabel("Enter a URL and click Download");
 
@@ -71,6 +73,7 @@ public class DownloaderUI implements ActionListener {
         panel.add(new JLabel("Save to:"));
         panel.add(saveLocationLabel);
         panel.add(browseButton);
+        panel.add(playlistCheckBox);
 
         thumbnailLabel.setPreferredSize(new java.awt.Dimension(160, 90));
         thumbnailLabel.setMinimumSize(new java.awt.Dimension(160, 90));
@@ -90,12 +93,13 @@ public class DownloaderUI implements ActionListener {
             String url = urlField.getText();
             String format = (String) formatBox.getSelectedItem();
             String quality = (String) qualityBox.getSelectedItem();
+            boolean playlist = playlistCheckBox.isSelected();
             showThumbnail(url); // fetch and display thumbnail before downloading
             statusLabel.setText("Downloading...");
             // run the download in a separate thread so the UI doesn't freeze
             new Thread(() -> {
                 try {
-                    Downloader downloader = new Downloader(url, saveLocationLabel.getText(),format, quality);
+                    Downloader downloader = new Downloader(url, saveLocationLabel.getText(), format, quality, playlist);
                     downloader.download(progressBar, progressLabel);
                     history.add(url, format); // save to history after a successful download
                     statusLabel.setText("Done!");
