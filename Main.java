@@ -1,7 +1,10 @@
-// Entry point for the app — creates the UI window and starts the program
+import com.formdev.flatlaf.FlatDarkLaf;
+
+
 public class Main {
 
     public static void main(String[] args) {
+        FlatDarkLaf.setup();
         new DownloaderUI();
     }
 
