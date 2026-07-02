@@ -7,17 +7,23 @@ public class Downloader {
     private String url;
     private String outputPath;
     private String format;
+
     private String quality;
     private boolean playlist;
+
 
     // Stores the URL, where to save the file, format, and quality
     Downloader(String url, String outputpath, String format, String quality, boolean playlist) {
         this.url = url;
         this.outputPath = outputpath;
         this.format = format;
+
         this.quality = quality;
         this.playlist = playlist;
     }
+
+        
+
 
     // Builds and runs the yt-dlp command, reads its output to update the progress bar
     public void download(JProgressBar progressBar, JLabel progressLabel) throws Exception {

@@ -1,6 +1,6 @@
-import javax.swing.*;
 import java.awt.event.*;
 import java.util.List;
+import javax.swing.*;
 
 // Builds the app window and handles button clicks
 public class DownloaderUI implements ActionListener {
@@ -115,12 +115,41 @@ public class DownloaderUI implements ActionListener {
             // load all history entries and show them in a popup dialog
             try {
                 List<String> entries = history.getAll();
-                String text = entries.isEmpty() ? "No history yet." : String.join("\n", entries);
-                JOptionPane.showMessageDialog(frame, text, "Download History", JOptionPane.PLAIN_MESSAGE);
+                if (entries.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "No history yet.", "Download History", JOptionPane.PLAIN_MESSAGE);
+                } else {
+                    JPanel historyPanel = new JPanel();
+                    historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
+
+                    for (String entry : entries) {
+                        String[] parts = entry.split(" \\| ");
+                        if (parts.length < 3) continue; // skip old/malformed entries
+                        String url = parts[2];
+
+                        JLabel thumbLabel = new JLabel();
+                        try {
+                            String id = extractVideoId(url);
+                            java.net.URL imageUrl = new java.net.URL("https://img.youtube.com/vi/" + id + "/default.jpg");
+                            java.awt.Image image = javax.imageio.ImageIO.read(imageUrl);
+                            image = image.getScaledInstance(120, 90, java.awt.Image.SCALE_SMOOTH);
+                            thumbLabel.setIcon(new ImageIcon(image));
+                        } catch (Exception ignore) {}
+
+                        JLabel textLabel = new JLabel(entry);
+
+                        JPanel row = new JPanel();
+                        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+                        row.add(thumbLabel);
+                        row.add(textLabel);
+
+                        historyPanel.add(row);
+                    }
+                    JOptionPane.showMessageDialog(frame, new JScrollPane(historyPanel), "Download History", JOptionPane.PLAIN_MESSAGE);
+                }
             } catch (Exception ex) {
                 statusLabel.setText("Error: " + ex.getMessage());
             }
-        }else if (e.getSource() == browseButton) {
+        } else if (e.getSource() == browseButton) {
             JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             int result = chooser.showOpenDialog(frame);
